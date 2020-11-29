@@ -1,0 +1,372 @@
+##
+## Program1.asm - prints out "hello world"
+##
+##	a0 - points to the string
+##
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+	.globl __start 
+
+__start:		# execution starts here
+	la $a0,str	# put string address into a0
+	li $v0,4	# system call to print
+	syscall	#   out a string
+
+	li $v0,10  # system call to exit
+	syscall	#    bye bye
+
+
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+
+	.data
+str:	.asciiz "hello world\n"
+n:	.word	10
+
+##
+## end of file Program1.asm
+
+
+##
+## Program2.asm asks user for temperature in Celsius,
+##  converts to Fahrenheit, prints the result.
+##
+##	v0 - reads in Celsius
+##	t0 - holds Fahrenheit result
+##	a0 - points to output strings
+##
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+	.globl __start	
+
+__start:
+	la $a0,prompt	# output prompt message on terminal
+	li $v0,4		# syscall 4 prints the string
+	syscall
+
+	li $v0, 5		# syscall 5 reads an integer
+	syscall
+
+	mul $t0,$v0,9	# to convert,multiply by 9,
+	div $t0,$t0,5	# divide by 5, then
+	add $t0,$t0,32	# add 32
+
+	la $a0,ans1	# print string before result
+	li $v0,4
+	syscall
+
+	move $a0,$t0	# print integer result
+	li $v0,1		# using syscall 1
+	syscall
+
+	la $a0,endl	# system call to print
+	li $v0,4		# out a newline
+	syscall
+
+	li $v0,10		# system call to exit
+	syscall		#    bye bye
+
+
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+
+	.data
+prompt:	.asciiz "Enter temperature (Celsius): "
+ans1:		.asciiz "The temperature in Fahrenheit is "
+endl:		.asciiz "\n"
+
+##
+## end of file Program2.asm
+
+##
+##	Program3.asm is a loop implementation
+##	of the Fibonacci function
+##        
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+.globl __start
+ 
+__start:			# execution starts here
+	li $a0,7		# to calculate fib(7)
+	jal fib		# call fib
+	move $a0,$v0	# print result
+	li $v0, 1
+	syscall
+
+	la $a0,end		# print newline
+	li $v0,4
+	syscall
+
+	li $v0,10
+	syscall		# bye bye
+
+#------------------------------------------------
+
+
+fib:	move $v0,$a0	# initialise last element
+	blt $a0,2,done	# fib(0)=0, fib(1)=1
+
+	li $t0,0		# second last element
+	li $v0,1		# last element
+
+loop:	add $t1,$t0,$v0	# get next value
+	move $t0,$v0	# update second last
+	move $v0,$t1	# update last element
+	sub $a0,$a0,1	# decrement count
+	bgt $a0,1,loop	# exit loop when count=1
+done:	jr $ra
+
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+
+	.data
+end:	.asciiz "\n"
+
+##
+## end of Program3.asm
+
+
+	#((A/B) - (C+D)) % E
+	
+.data
+	 getA: .asciiz "Enter the value of A: "
+	 getB: .asciiz "Enter the value of B: "
+	 getC: .asciiz "Enter the value of C: "
+	 getD: .asciiz "Enter the value of D: "
+	 getE: .asciiz "Enter the value of E: "
+	 prompt: .asciiz "Result is : "
+
+.text
+	#prompt to get A 
+	li $v0, 4
+	la $a0, getA
+	syscall 
+	#get the value of A from user
+	li $v0, 5
+	syscall
+	
+	move $t0, $v0 # $t0 = A
+	
+	#prompt to get B
+	li $v0, 4
+	la $a0, getB
+	syscall 
+	#get the value of B from user
+	li $v0, 5
+	syscall
+	
+	move $t1, $v0 # $t1 = B
+	
+	#prompt to get C 
+	li $v0, 4
+	la $a0, getC
+	syscall 
+	#get the value of C from user
+	li $v0, 5
+	syscall
+	
+	move $t2, $v0 # $t2 = C
+	
+	#prompt to get D 
+	li $v0, 4
+	la $a0, getD 
+	syscall 
+	#get the value of D from user
+	li $v0, 5
+	syscall
+	
+	move $t3, $v0 # $t3 = D
+	
+	#prompt to get E 
+	li $v0, 4
+	la $a0, getE
+	syscall 
+	#get the value of E from user
+	li $v0, 5
+	syscall
+	move $t4, $v0 # $t4 = E
+	
+	
+	div $t0, $t1 #$t0 / $t1
+	mflo $t5 #$t5 = $t0 / $t1
+	sub $t5, $t5, $t2 #$t5 = $t5 - $t2
+	sub $t5, $t5, $t3 #$t5 = $t5 - $t3
+	div $t5, $t4 #$t5 / $t4
+	mfhi $t6 # $t6 = $t5 % $t4
+	
+	#prompt
+	li $v0, 4
+	la $a0, prompt
+	syscall 
+	
+	#display the result
+	li $v0, 1
+	move $a0, $t6
+	syscall
+	
+	#end the program
+	li $v0, 10
+	syscall
+	
+	.data
+array:    .space 400
+
+	prompt0: .asciiz "Enter the size of the array: "
+	prompt1: .asciiz "Enter the values of the array (Enter 0 to end): \n"
+	option1: .asciiz " 1 - Find summation of numbers stored in the array which is greater than an input number.\n"
+	option2: .asciiz " 2 - Find summation of even and odd numbers and display them.\n"
+	option3: .asciiz " 3 - Display the number of occurrences of the array elements divisible by a certain input number.\n"
+	option4: .asciiz " 4 - Quit\n"
+	prompt2: .asciiz " Enter a option: " 
+	prompt3: .asciiz " Enter an integer: "
+	prompt4: .asciiz " Sum of the odd numbers: \n"
+	prompt5: .asciiz " Sum of the even numbers: \n"
+	prompt6: .asciiz " Number of Occurence: \n"
+   .text
+	main:
+			
+	        	addi $t0, $zero, 0
+	           	
+	           	
+	           	li $v0, 4
+			la $a0, prompt0
+			syscall
+			
+			li $v0, 5
+	   		syscall
+	   		
+	   		move $t1, $v0
+	   		mul $t2, $t1, 4
+						        	
+			li $v0, 4
+			la $a0, prompt1
+			syscall 
+		#Create the array with user's inputs
+	top: 
+	       		li $v0, 5
+	       		syscall
+	       		beq $v0, 0, done
+	       		sw $v0, array($t0)
+	       		addi $t0, $t0, 4
+	       	
+   bottomTest:  	bne $t0, $t2, top
+         done:	 	addi $t0, $t0, -4
+         	
+         menu:		#display option 1
+         		li $v0, 4
+			la $a0, option1
+			syscall 
+			
+			#display option 2
+			li $v0, 4
+			la $a0, option2
+			syscall 
+			
+			#display option 3
+			li $v0, 4
+			la $a0, option3
+			syscall 
+			
+			#display option 4
+			li $v0, 4
+			la $a0, option4
+			syscall 
+			
+			#display prompt
+			li $v0, 4
+			la $a0, prompt2
+			syscall 
+			
+			#get option from user
+			li $v0, 5
+			syscall	
+			
+			j select
+			
+			
+			
+	select: 
+			beq $v0, 1, sumGreaterthanInput
+			beq $v0, 2, sumEvenOdd
+			beq $v0, 3, divisibleOccurence
+			beq $v0, 4, exit
+			
+	sumGreaterthanInput:	
+				#prompt
+				li $v0, 4
+				la $a0, prompt3
+				syscall 
+				
+				#get integer input 
+				li $v0, 5
+				syscall
+				j menu
+					
+	sumEvenOdd:		
+				li $v0, 4
+				la $a0, prompt4
+				syscall 
+				
+				li $v0, 4
+				la $a0, prompt5
+				syscall 
+			
+				j menu
+	
+	divisibleOccurence:	
+				li $v0, 4
+				la $a0, prompt3
+				syscall 
+				
+				li $v0, 5
+				syscall
+				
+				li $v0, 4
+				la $a0, prompt6
+				syscall
+		
+				j menu
+	
+		exit:	
+				li $v0, 10
+				syscall	
+	
+              
+              
+              
+              
+
+
+
+
+	
+	
+	
+	
